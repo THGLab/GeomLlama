@@ -21,6 +21,12 @@ dataset_prepared/
 *.log
 *.out
 
+# editor / OS cruft
+*.swp
+*.swo
+*~
+.DS_Store
+
 data/
 results/
 cache/
