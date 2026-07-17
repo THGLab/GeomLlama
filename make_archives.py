@@ -77,7 +77,7 @@ def _results_pred(rel):
     """rel is relative to the repo root: results/... or cache/..."""
     if rel.parts[0] == "cache":
         return rel.name in SMILEY_KEEP
-    if len(rel.parts) > 1 and rel.parts[1] == "frontier_inference":
+    if len(rel.parts) > 1 and rel.parts[1] == "pure_qm9":
         return rel.suffix == ".jsonl"
     return rel.name in SMILEY_KEEP
 

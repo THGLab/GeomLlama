@@ -1,9 +1,10 @@
-# frontier_inference
+# pure_qm9
 
-Ask a frontier LLM to generate 3D molecular geometries (XYZ or Z-matrix)
-directly from a SMILES string, using only its training knowledge — no
-cheminformatics toolkits, no external calculators — then score the generated
-geometry against a ground-truth structure via RMSD.
+The QM9 single-geometry benchmark suite (Table 1). Ask a model — a fine-tuned
+GeomLlama/GeomQwen checkpoint or an untuned frontier LLM — to generate a 3D
+molecular geometry (XYZ or Z-matrix) directly from a SMILES string, using only
+its training knowledge — no cheminformatics toolkits, no external calculators —
+then score the generated geometry against a ground-truth structure via RMSD.
 
 Supports **OpenAI**, **Anthropic (Claude)**, and **Google (Gemini)** models
 through a single interface (`litellm`), plus extended **thinking/reasoning**

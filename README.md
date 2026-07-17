@@ -80,7 +80,7 @@ Then run each step under the matching environment: `scripts/prepare_*.py`,
 Narrower extras are available if you don't need the whole analysis stack:
 `[data]` (prep scripts; includes torch-geometric, required to unpickle the GEOM
 archives), `[synth]` (the Figure 3 pipeline), `[vllm]`, and `[dev]` (pytest).
-`frontier_inference/` is self-contained and has its own `requirements.txt`.
+`pure_qm9/` (the Table 1 benchmark suite) is self-contained and has its own `requirements.txt`.
 
 **xTB** is not a pip dependency. The `synth/` optimization stage calls the
 standalone `xtb` binary, so install it separately — `conda install -c
@@ -186,23 +186,26 @@ cleanly.
 
 ### Table 1: QM9 Single-Geometry Benchmarks
 
-**Using cached results** (no GPU needed):
+**Using cached results** (no GPU needed) — after `download_data.py --results`,
+the cached JSONL land in `results/pure_qm9/`:
 ```bash
-cd frontier_inference
-python eval_tables.py  # auto-discovers all *.jsonl result files, generates LaTeX table
+python pure_qm9/eval_tables.py --results-dir results/pure_qm9
+# auto-discovers all *.jsonl in that dir, generates the LaTeX table
 ```
 
 **Running a new frontier model:**
 ```bash
-cd frontier_inference
+cd pure_qm9
 # Hosted API (requires API key in environment)
-python run.py --input ../data/qm9/test_set.json --model gpt-4o --format zmat --output new_model.jsonl
+python run.py --input ../data/qm9/test_set.json --model gpt-4o --format zmat \
+    --output ../results/pure_qm9/new_model.jsonl
 
 # Local model via vLLM
-python infer_vllm.py --input ../data/qm9/test_set.json --model <model_path> --format zmat --output new_model.jsonl
+python infer_vllm.py --input ../data/qm9/test_set.json --model <model_path> --format zmat \
+    --output ../results/pure_qm9/new_model.jsonl
 
 # Regenerate table (auto-discovers the new JSONL)
-python eval_tables.py
+python eval_tables.py --results-dir ../results/pure_qm9
 ```
 
 **Fine-tuning a new QM9 model:**
