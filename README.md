@@ -115,21 +115,19 @@ code runs. If your numbers drift from the paper, the per-package notes in
 
 ## Downloading Data
 
-> **Status: the figshare archives are being uploaded and will be available
-> shortly.** The `--datasets`, `--sft` and `--results` commands below will
-> report that their URL is not yet configured until the upload completes and
-> this repository is updated with the DOIs. Everything else — the code, the
-> training configs, and `--alpaca` — works today. If you need the data before
-> this notice is removed, please open an issue.
+Data is hosted on figshare
+([doi:10.6084/m9.figshare.33023465](https://doi.org/10.6084/m9.figshare.33023465),
+CC0 1.0). Each archive is checksum-verified against figshare's stored MD5 on
+download.
 
 ```bash
-# Download test/eval datasets (JSON splits + test dicts)   [coming soon]
+# Download test/eval datasets (JSON splits + test dicts)
 python download_data.py --datasets
 
-# Download SFT training data (JSONL files)                 [coming soon]
+# Download SFT training data (JSONL files)
 python download_data.py --sft
 
-# Download saved results (frontier inference + SmileyLlama) [coming soon]
+# Download saved results (Table 1 benchmarks + SmileyLlama Figure 3)
 python download_data.py --results
 
 # Download the Alpaca instruction mix (needed only to train the hybrid models)

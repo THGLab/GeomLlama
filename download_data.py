@@ -4,7 +4,7 @@
 Usage:
     python download_data.py --datasets       # Test/eval JSON + pickles
     python download_data.py --sft            # JSONL training data
-    python download_data.py --results        # Frontier inference + SmileyLlama results
+    python download_data.py --results        # Table 1 benchmarks + SmileyLlama results
     python download_data.py --alpaca         # Alpaca instruction mix (from upstream)
     python download_data.py --all            # Everything
 """
@@ -17,10 +17,19 @@ import sys
 import urllib.request
 import zipfile
 
+# figshare: "GeomLlama Data", doi:10.6084/m9.figshare.33023465 (CC0 1.0).
+# Per-file ndownloader URLs are stable across versions of the article. The MD5s
+# are figshare's stored checksums; downloads are verified against them.
+FIGSHARE_DOI = "10.6084/m9.figshare.33023465"
 URLS = {
-    "datasets": "FIGSHARE_URL_DATASETS",
-    "sft": "FIGSHARE_URL_SFT",
-    "results": "FIGSHARE_URL_RESULTS",
+    "datasets": "https://ndownloader.figshare.com/files/66755084",
+    "sft": "https://ndownloader.figshare.com/files/66755087",
+    "results": "https://ndownloader.figshare.com/files/66755075",
+}
+MD5 = {
+    "datasets": "478ee54b1557e42a8bf48e09d6ebf272",
+    "sft": "adde3b33c721840dc02b98e3d52559c1",
+    "results": "f5a50a8845c689baf9e9ea233c2fadf7",
 }
 
 # Every archive stores repo-root-relative paths ("data/qm9/test_set.json",
@@ -51,22 +60,26 @@ ALPACA_DEST = os.path.join("data", "alpaca", "alpaca.jsonl")
 
 
 def download_and_extract(name, url, extract_to):
-    if url.startswith("FIGSHARE_URL"):
-        print(f"'{name}' is not available yet.\n"
-              f"\n"
-              f"The figshare archives are being uploaded and will be available\n"
-              f"shortly; this script will be updated with their DOIs. In the\n"
-              f"meantime the code, the training configs, and `--alpaca` all work.\n"
-              f"If you need this data now, please open an issue at\n"
-              f"https://github.com/THGLab/GeomLlama/issues -- we would rather send\n"
-              f"it to you directly than have you wait.")
-        return False
-
     zip_path = f"{name}.zip"
     print(f"Downloading {name}...")
     urllib.request.urlretrieve(url, zip_path)
 
-    print(f"Extracting to {extract_to}/...")
+    expected = MD5.get(name)
+    if expected:
+        print(f"Verifying {name} (md5)...")
+        h = hashlib.md5()
+        with open(zip_path, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        if h.hexdigest() != expected:
+            os.remove(zip_path)
+            print(f"ERROR: {name} checksum mismatch.\n"
+                  f"  expected: {expected}\n"
+                  f"  got:      {h.hexdigest()}\n"
+                  f"Download corrupted or the archive changed; nothing extracted.")
+            return False
+
+    print(f"Extracting {name}...")
     os.makedirs(extract_to, exist_ok=True)
     with zipfile.ZipFile(zip_path) as zf:
         zf.extractall(extract_to)
@@ -122,7 +135,7 @@ def main():
     parser.add_argument("--sft", action="store_true",
                         help="Download SFT training data (JSONL)")
     parser.add_argument("--results", action="store_true",
-                        help="Download saved results (frontier inference + SmileyLlama)")
+                        help="Download saved results (Table 1 benchmarks + SmileyLlama)")
     parser.add_argument("--alpaca", action="store_true",
                         help="Download the Alpaca instruction mix from upstream "
                              "(needed by the GEOM hybrid configs)")
