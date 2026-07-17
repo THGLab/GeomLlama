@@ -52,8 +52,14 @@ ALPACA_DEST = os.path.join("data", "alpaca", "alpaca.jsonl")
 
 def download_and_extract(name, url, extract_to):
     if url.startswith("FIGSHARE_URL"):
-        print(f"ERROR: {name} URL not yet configured. Update URLS in download_data.py "
-              f"with the figshare DOI/URL after uploading.")
+        print(f"'{name}' is not available yet.\n"
+              f"\n"
+              f"The figshare archives are being uploaded and will be available\n"
+              f"shortly; this script will be updated with their DOIs. In the\n"
+              f"meantime the code, the training configs, and `--alpaca` all work.\n"
+              f"If you need this data now, please open an issue at\n"
+              f"https://github.com/THGLab/GeomLlama/issues -- we would rather send\n"
+              f"it to you directly than have you wait.")
         return False
 
     zip_path = f"{name}.zip"

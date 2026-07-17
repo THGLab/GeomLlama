@@ -8,10 +8,35 @@ version = "1.0.0"
 description = "Fine-tuning LLMs to generate 3D molecular geometries from SMILES strings"
 readme = "README.md"
 requires-python = ">=3.10"
-# Lower bounds only, so the package stays installable as upstreams move. For the
-# exact versions that produced the paper, use requirements-analysis.txt.
-# rdkit and scikit-learn are the results-sensitive ones -- see "Known version
-# issues" in README.md.
+# Lower bounds only, so the package stays installable as upstreams move. To
+# reproduce the paper's numbers exactly, install requirements-analysis.txt
+# instead -- it pins the versions the published results were produced with.
+#
+# Some of these affect RESULTS, not just whether the code runs. If your numbers
+# drift from the paper, suspect these first (paper version in parens):
+#
+#   rdkit (2025.9.6)       Canonical SMILES generation and bond perception have
+#                          changed across releases. Every prompt is keyed on a
+#                          canonical SMILES, so a different RDKit can change
+#                          model inputs AND RMSD evaluation (GetBestRMS). The
+#                          single most results-sensitive dependency.
+#                          NB: >=2025 dropped the attribute-style
+#                          Chem.rdDetermineBonds import; this package uses the
+#                          submodule form already.
+#   scikit-learn (1.8.0)   scripts/prepare_qm9.py defines the QM9 train/test
+#                          split with train_test_split(random_state=42). The
+#                          split only reproduces if shuffling behavior matches;
+#                          tests/test_splits.py re-derives it and checks.
+#   torch-geometric (2.7.0) Required to unpickle the GEOM archives even though
+#                          nothing imports it -- the pickles hold PyG Data
+#                          objects. Written by an older PyG, so prepare_*.py
+#                          reads rdmol via __dict__.get() rather than attribute
+#                          access, which raises on current versions.
+#   matplotlib (3.10.8) /  Figure rendering changes between releases. Figure 3
+#   seaborn (0.13.2)       is byte-identical only on the pinned versions; other
+#                          versions still give a correct figure, just not an
+#                          identical file.
+#   numpy (2.2.6)          RandomState semantics; 1.x is a breaking change.
 dependencies = [
     "numpy>=2.0",
     "scipy>=1.11",

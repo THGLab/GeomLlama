@@ -96,8 +96,8 @@ export XTB_BIN=/path/to/xtb
 ### Reproducing the exact environment
 
 The extras above use lower bounds, so a fresh install picks up current releases.
-To match the environment that produced the paper's numbers instead, install from
-the lock files:
+To match the environment that produced the paper's numbers, install from the
+lock files instead:
 
 ```bash
 # Analysis (Python 3.11.7)
@@ -109,42 +109,27 @@ pip install -r requirements-training.txt
 
 Training ran on 4x A40 GPUs with CUDA 12.6.
 
-### Known version issues
-
-A few dependencies affect *results*, not just whether the code runs. If your
-numbers drift from the paper, start here:
-
-- **RDKit** (paper used 2025.9.6) — canonical SMILES generation and bond
-  perception have changed across releases. Every prompt is keyed on a canonical
-  SMILES, so a different RDKit can change model inputs and RMSD evaluation
-  (`GetBestRMS`). This is the single most results-sensitive dependency.
-- **scikit-learn** (1.8.0) — `prepare_qm9.py` defines the QM9 train/test split
-  with `train_test_split(..., random_state=42)`. The split is only reproducible
-  if the shuffling behavior matches. `tests/test_splits.py` verifies this by
-  re-deriving the split and comparing filenames; run it after preparing data.
-- **torch-geometric** (2.7.0) — required to unpickle the GEOM archives even
-  though nothing imports it directly, since the pickles contain PyG `Data`
-  objects. The raw pickles were written by an older PyG, so `prepare_*.py`
-  reads `rdmol` via `data_obj.__dict__.get("rdmol")` rather than attribute
-  access, which raises under current versions.
-- **matplotlib / seaborn** (3.10.8 / 0.13.2) — figure rendering changes between
-  releases. Figure 3 reproduces byte-identically only on the pinned versions;
-  different versions still produce a correct figure, just not an identical file.
-- **RDKit ≥ 2025** — the attribute-style `Chem.rdDetermineBonds` import no
-  longer works. The code already uses the submodule form
-  (`from rdkit.Chem.rdDetermineBonds import DetermineConnectivity,
-  DetermineBondOrders`); this note is here in case you adapt that code.
+A few dependencies — RDKit above all — affect *results*, not just whether the
+code runs. If your numbers drift from the paper, the per-package notes in
+[`pyproject.toml`](pyproject.toml) explain which ones and why.
 
 ## Downloading Data
 
+> **Status: the figshare archives are being uploaded and will be available
+> shortly.** The `--datasets`, `--sft` and `--results` commands below will
+> report that their URL is not yet configured until the upload completes and
+> this repository is updated with the DOIs. Everything else — the code, the
+> training configs, and `--alpaca` — works today. If you need the data before
+> this notice is removed, please open an issue.
+
 ```bash
-# Download test/eval datasets (JSON splits + test dicts)
+# Download test/eval datasets (JSON splits + test dicts)   [coming soon]
 python download_data.py --datasets
 
-# Download SFT training data (JSONL files)
+# Download SFT training data (JSONL files)                 [coming soon]
 python download_data.py --sft
 
-# Download saved results (frontier inference + SmileyLlama)
+# Download saved results (frontier inference + SmileyLlama) [coming soon]
 python download_data.py --results
 
 # Download the Alpaca instruction mix (needed only to train the hybrid models)
