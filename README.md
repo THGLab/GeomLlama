@@ -107,7 +107,7 @@ pip install -r requirements-analysis.txt && pip install -e . --no-deps
 pip install -r requirements-training.txt
 ```
 
-Training ran on 4x A40 GPUs with CUDA 12.6.
+Training ran on a 4x Nvidia GPU.
 
 A few dependencies — RDKit above all — affect *results*, not just whether the
 code runs. If your numbers drift from the paper, the per-package notes in
@@ -298,7 +298,7 @@ The two model families differ as follows:
 | Datasets | 1 (single-format JSONL) | 3 (GEOM-Drugs + GEOM-QM9 + Alpaca mix) |
 | 8-bit loading | yes | no |
 
-All runs used 4x A40 GPUs with `micro_batch_size: 1` and
+All runs used 4x GPUs with `micro_batch_size: 1` and
 `gradient_accumulation_steps: 1`, giving an effective batch size of 4. If you
 train on a different number of GPUs, change `gradient_accumulation_steps` to keep
 the effective batch at 4.
