@@ -1,0 +1,8 @@
+litellm
+asyncio-throttle
+rdkit
+numpy
+scipy
+
+# Install vllm separately on the cluster — it's heavy and platform-specific:
+#   pip install vllm

@@ -1,0 +1,70 @@
+# QM9 single-geometry: Llama-3.1-8B-Instruct + Fenske-Hall Z-matrix (Table 1)
+#
+# Trained on 4x A40 GPUs. With micro_batch_size=1 and
+# gradient_accumulation_steps=1, the effective batch size is 4 (one per GPU).
+# Adjust gradient_accumulation_steps to match if you train on fewer GPUs.
+base_model: meta-llama/Llama-3.1-8B-Instruct
+model_type: LlamaForCausalLM
+tokenizer_type: AutoTokenizer
+is_llama_derived_model: true
+
+load_in_8bit: true
+load_in_4bit: false
+strict: false
+
+datasets:
+  - path: data/qm9/ori_fh.jsonl
+    ds_type: json
+    type: alpaca
+dataset_prepared_path: dataset_prepared
+val_set_size: 0.0
+output_dir: outputs
+
+sequence_len: 2048
+sample_packing: true
+eval_sample_packing: true
+pad_to_sequence_len: true
+
+overrides_of_model_config:
+  rope_scaling:
+      factor: 1.0
+      low_freq_factor: 1.0
+      high_freq_factor: 4.0
+      original_max_position_embeddings: 8192
+      rope_type: llama3
+
+adapter: lora
+lora_model_dir:
+lora_r: 32
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_linear: true
+lora_fan_in_fan_out:
+
+wandb_project: YOUR_WANDB_PROJECT
+wandb_entity: YOUR_WANDB_ENTITY
+wandb_name: qm9_8b_ori_fh_4e
+
+gradient_accumulation_steps: 1
+micro_batch_size: 1
+num_epochs: 4
+optimizer: adamw_bnb_8bit
+lr_scheduler: cosine
+learning_rate: 0.0002
+
+train_on_inputs: false
+group_by_length: false
+bf16: auto
+fp16:
+tf32: false
+
+gradient_checkpointing: true
+logging_steps: 1
+flash_attention: true
+
+warmup_steps: 10
+evals_per_epoch: 4
+saves_per_epoch: 1
+weight_decay: 0.0
+special_tokens:
+    pad_token: <|finetune_right_pad_id|>

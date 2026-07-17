@@ -1,0 +1,10 @@
+# Core library dependencies only. This mirrors [project.dependencies] in
+# pyproject.toml; prefer `pip install -e .`, which is the supported path.
+# For the full analysis or finetuning environments, see "Environments" in
+# README.md -- those stacks conflict and must not share a venv.
+numpy
+scipy
+tqdm
+rdkit
+matplotlib
+joblib
