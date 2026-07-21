@@ -54,7 +54,10 @@ METHODS = [
     #  'format': 'template_fh', 'mode': 'free', 'color': '#1B9E77',
     #  'cache': f'{RESULTS_DIR}/template_fh_8b_4e_{TAG}_free_T1.json'},
     {'name': 'z-matrix',
-     'path': 'models/8b_hybrid/4e_fh/outputs/merged',
+     # The published GEOM hybrid ori_fh model. Override with a local path
+     # (e.g. a freshly merged models/8b_hybrid/4e_fh/outputs/merged) if you
+     # retrain; any vLLM-loadable path or HF id works.
+     'path': os.environ.get('GEOMLLAMA_MODEL', 'THGLab/Llama-3.1-8B-GeomLlama-zmatrix'),
      'format': 'ori_fh', 'mode': 'free', 'color': '#4682B4',
      'cache': f'{RESULTS_DIR}/ori_fh_8b_4e_{TAG}_free_T1.json'},
 ]

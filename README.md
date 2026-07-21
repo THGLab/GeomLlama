@@ -105,9 +105,17 @@ pip install -r requirements-analysis.txt && pip install -e . --no-deps
 
 # Finetuning (Python 3.11.6, separate venv)
 pip install -r requirements-training.txt
+export AXOLOTL_DO_NOT_TRACK=1   # axolotl 0.13.2 crashes on startup without this
+# optional, for the published speed/memory profile (needs nvcc, slow compile):
+pip install flash-attn==2.8.3 --no-build-isolation
 ```
 
-Training ran on a 4x Nvidia GPU.
+Training ran on 4x NVIDIA A40 (CUDA 12.6). The finetuning install has a few
+sharp edges — flash-attn cannot go in the requirements file, `AXOLOTL_DO_NOT_TRACK`
+is mandatory, and skipping flash-attn means setting `flash_attention: false` and
+`sample_packing: false` in the configs. The header of
+[`requirements-training.txt`](requirements-training.txt) explains each; read it
+before building that environment.
 
 A few dependencies — RDKit above all — affect *results*, not just whether the
 code runs. If your numbers drift from the paper, the per-package notes in
@@ -308,6 +316,8 @@ Llama configs pin `pad_token: <|finetune_right_pad_id|>` and override
 `rope_scaling`; the Qwen configs do neither, since Qwen ships its own pad token.
 
 See `configs/examples/` for ready-to-use axolotl configs. Any Alpaca-compatible trainer can use the JSONL files directly.
+
+Some of this code was written and bug-tested with Claude Code and Codex.
 
 ## Citation
 

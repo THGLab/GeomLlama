@@ -4,23 +4,38 @@
 # transformers versions that conflict with the analysis environment's vLLM
 # install; combining them produces an environment that cannot run either.
 #
-#   python -m venv .venv-training && source .venv-training/bin/activate
-#   pip install -r requirements-training.txt
-#
 # Python 3.11.6, 4x NVIDIA A40, CUDA 12.6.
 #
-# flash-attn builds against your installed torch and CUDA toolkit, so it must be
-# installed after torch and generally needs `--no-build-isolation`. If the build
-# fails, drop `flash_attention: true` from the axolotl configs -- it affects
-# speed and memory, not results.
+# Install order matters -- do NOT add flash-attn to this file (see below):
+#
+#   python -m venv .venv-training && source .venv-training/bin/activate
+#   pip install -r requirements-training.txt
+#   export AXOLOTL_DO_NOT_TRACK=1          # see note [1]
+#   # optional, for the published speed/memory profile -- see note [2]:
+#   pip install flash-attn==2.8.3 --no-build-isolation
+#
+# [1] axolotl 0.13.2's wheel does not ship telemetry/whitelist.yaml, but its
+#     telemetry manager loads it on startup, so preprocess/train crash with
+#     FileNotFoundError unless telemetry is disabled. Export this in every shell
+#     that runs axolotl (or add it to the venv activate script).
+#
+# [2] flash-attn is deliberately NOT pinned in this file. There is no prebuilt
+#     wheel for torch 2.10, so pip falls back to a source build whose setup.py
+#     imports torch -- which fails under pip's isolated build env and, because
+#     pip resolves the file as one set, aborts the ENTIRE install. Install it
+#     separately, after torch is present, with --no-build-isolation (needs nvcc,
+#     ~30-90 min compile). If you skip it, set `flash_attention: false` and
+#     `sample_packing: false` in the axolotl configs (sample packing uses
+#     flash-attn's varlen kernels). This affects speed/memory, not results.
 
 axolotl==0.13.2
 torch==2.10.0
+torchvision==0.25.0        # axolotl 0.13.2 imports SmolVLMProcessor unconditionally
 transformers==4.57.6
 accelerate==1.12.0
 deepspeed==0.18.2
 bitsandbytes==0.49.1
 peft==0.18.1
+torchao==0.13.0            # axolotl hard-imports torchao.quantization.qat; peft gates its version
 trl==0.27.0
 datasets==4.5.0
-flash-attn==2.8.3
